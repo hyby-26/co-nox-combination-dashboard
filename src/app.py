@@ -1,5 +1,6 @@
 from dash import Dash, Input, Output, dcc, html
 
+from components import correlation, data_quality, distribution, timeseries
 from data_loader import get_sensor_columns, get_years, load_data
 from filters import filter_data, format_summary
 
@@ -62,6 +63,29 @@ def update_filter_summary(selected_years, selected_columns):
         return "연도와 컬럼을 하나 이상 선택하세요."
     filtered = filter_data(df, selected_years, selected_columns)
     return format_summary(filtered, selected_years, selected_columns)
+
+
+@app.callback(
+    Output("tab-content", "children"),
+    Input("tabs", "value"),
+    Input("year-filter", "value"),
+    Input("column-filter", "value"),
+)
+def update_tab_content(active_tab, selected_years, selected_columns):
+    if not selected_years or not selected_columns:
+        return "연도와 컬럼을 하나 이상 선택하세요."
+
+    filtered = filter_data(df, selected_years, selected_columns)
+
+    if active_tab == "tab-distribution":
+        return distribution.render(filtered)
+    if active_tab == "tab-timeseries":
+        return timeseries.render(filtered)
+    if active_tab == "tab-correlation":
+        return correlation.render(filtered)
+    if active_tab == "tab-quality":
+        return data_quality.render(filtered)
+    return "준비 중"
 
 
 if __name__ == "__main__":
