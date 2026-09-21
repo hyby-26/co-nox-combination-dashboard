@@ -12,6 +12,8 @@ dash.register_page(__name__, path="/", name="대시보드")
 df = load_data()
 years = get_years(df)
 sensor_columns = get_sensor_columns(df)
+FULL_START = df["datetime"].min()
+FULL_END = df["datetime"].max()
 
 TAB_STYLE = {
     "padding": "14px 4px",
@@ -127,7 +129,7 @@ def update_tab_content(active_tab, applied_filters):
     filtered = filter_data(df, applied_filters["years"], applied_filters["columns"])
 
     if active_tab == "tab-overview":
-        return overview.render(filtered)
+        return overview.render(filtered, FULL_START, FULL_END)
     if active_tab == "tab-distribution":
         return distribution.render(filtered)
     if active_tab == "tab-timeseries":

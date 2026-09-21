@@ -2,10 +2,8 @@ import pandas as pd
 from dash import html
 
 
-def build_metadata_summary(filtered_df: pd.DataFrame) -> html.Div:
-    start = filtered_df["datetime"].min()
-    end = filtered_df["datetime"].max()
-    return html.Div([html.P(f"기간: {start:%Y-%m-%d} ~ {end:%Y-%m-%d}")])
+def build_metadata_summary(full_start: pd.Timestamp, full_end: pd.Timestamp) -> html.Div:
+    return html.Div([html.P(f"데이터 전체 기간: {full_start:%Y-%m-%d} ~ {full_end:%Y-%m-%d}")])
 
 
 def build_summary_stats_table(filtered_df: pd.DataFrame) -> html.Table:
@@ -22,13 +20,13 @@ def build_summary_stats_table(filtered_df: pd.DataFrame) -> html.Table:
     return html.Table([header] + rows)
 
 
-def render(filtered_df: pd.DataFrame) -> html.Div:
+def render(filtered_df: pd.DataFrame, full_start: pd.Timestamp, full_end: pd.Timestamp) -> html.Div:
     columns = [c for c in filtered_df.columns if c != "datetime"]
     if not columns:
         return "컬럼을 1개 이상 선택하세요."
     return html.Div(
         [
-            build_metadata_summary(filtered_df),
+            build_metadata_summary(full_start, full_end),
             html.Div(build_summary_stats_table(filtered_df), className="table-scroll"),
         ]
     )

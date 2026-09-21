@@ -11,10 +11,12 @@ def _sample_df():
     })
 
 
-def test_build_metadata_summary_reports_only_date_range():
-    div = build_metadata_summary(_sample_df())
+def test_build_metadata_summary_reports_full_dataset_date_range():
+    full_start = pd.Timestamp("2011-01-01")
+    full_end = pd.Timestamp("2015-12-08")
+    div = build_metadata_summary(full_start, full_end)
     texts = [p.children for p in div.children]
-    assert texts == ["기간: 2011-01-01 ~ 2011-01-03"]
+    assert texts == ["데이터 전체 기간: 2011-01-01 ~ 2015-12-08"]
 
 
 def test_build_summary_stats_table_includes_mean_row_for_each_column():
