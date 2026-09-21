@@ -6,29 +6,38 @@ from components.timeseries import build_timeseries_figure
 
 def test_build_timeseries_figure_creates_one_trace_per_column():
     df = pd.DataFrame({
-        "datetime": pd.to_datetime(["2011-01-01", "2011-01-02", "2011-01-03"]),
-        "AT": [1.0, 2.0, 3.0],
-        "CO": [10.0, 20.0, 30.0],
+        "datetime": pd.date_range("2011-01-01", periods=48, freq="h"),
+        "AT": range(48),
+        "CO": range(48),
     })
-    fig = build_timeseries_figure(df)
+    fig = build_timeseries_figure(df, resample_rule="D")
     assert len(fig.data) == 2
     assert [trace.name for trace in fig.data] == ["AT", "CO"]
 
 
 def test_build_timeseries_figure_uses_scattergl_for_performance():
     df = pd.DataFrame({
-        "datetime": pd.to_datetime(["2011-01-01", "2011-01-02"]),
-        "AT": [1.0, 2.0],
+        "datetime": pd.date_range("2011-01-01", periods=48, freq="h"),
+        "AT": range(48),
     })
-    fig = build_timeseries_figure(df)
+    fig = build_timeseries_figure(df, resample_rule="D")
     assert isinstance(fig.data[0], go.Scattergl)
 
 
-def test_build_timeseries_figure_uses_datetime_as_x_axis():
+def test_build_timeseries_figure_resamples_to_requested_rule():
     df = pd.DataFrame({
-        "datetime": pd.to_datetime(["2011-01-01", "2011-01-02"]),
-        "AT": [5.0, 6.0],
+        "datetime": pd.date_range("2011-01-01", periods=48, freq="h"),
+        "AT": [0] * 24 + [10] * 24,
+    })
+    fig = build_timeseries_figure(df, resample_rule="D")
+    assert list(fig.data[0].y) == [0.0, 10.0]
+    assert len(fig.data[0].x) == 2
+
+
+def test_build_timeseries_figure_default_resample_rule_is_daily():
+    df = pd.DataFrame({
+        "datetime": pd.date_range("2011-01-01", periods=48, freq="h"),
+        "AT": range(48),
     })
     fig = build_timeseries_figure(df)
-    assert list(fig.data[0].x) == list(pd.to_datetime(["2011-01-01", "2011-01-02"]))
-    assert list(fig.data[0].y) == [5.0, 6.0]
+    assert len(fig.data[0].x) == 2
