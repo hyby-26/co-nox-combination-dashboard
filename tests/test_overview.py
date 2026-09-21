@@ -11,12 +11,10 @@ def _sample_df():
     })
 
 
-def test_build_metadata_summary_reports_row_count_and_date_range():
+def test_build_metadata_summary_reports_only_date_range():
     div = build_metadata_summary(_sample_df())
     texts = [p.children for p in div.children]
-    assert any("3행" in t for t in texts)
-    assert any("2011-01-01" in t and "2011-01-03" in t for t in texts)
-    assert any("2개" in t for t in texts)
+    assert texts == ["기간: 2011-01-01 ~ 2011-01-03"]
 
 
 def test_build_summary_stats_table_includes_mean_row_for_each_column():

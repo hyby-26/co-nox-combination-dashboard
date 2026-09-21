@@ -3,17 +3,9 @@ from dash import html
 
 
 def build_metadata_summary(filtered_df: pd.DataFrame) -> html.Div:
-    row_count = len(filtered_df)
-    columns = [c for c in filtered_df.columns if c != "datetime"]
     start = filtered_df["datetime"].min()
     end = filtered_df["datetime"].max()
-    return html.Div(
-        [
-            html.P(f"전체 행 수: {row_count:,}행"),
-            html.P(f"기간: {start:%Y-%m-%d} ~ {end:%Y-%m-%d}"),
-            html.P(f"선택된 컬럼 수: {len(columns)}개"),
-        ]
-    )
+    return html.Div([html.P(f"기간: {start:%Y-%m-%d} ~ {end:%Y-%m-%d}")])
 
 
 def build_summary_stats_table(filtered_df: pd.DataFrame) -> html.Table:
