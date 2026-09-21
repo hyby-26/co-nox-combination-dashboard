@@ -11,14 +11,6 @@ MOON_ICON = html.Img(
 )
 
 
-def _page_nav():
-    links = [
-        dcc.Link(page["name"], href=page["relative_path"], className="page-nav-link")
-        for page in dash.page_registry.values()
-    ]
-    return html.Div(links, className="page-nav")
-
-
 app.layout = html.Div(
     [
         dcc.Store(id="theme-store", storage_type="local", data="light"),
@@ -33,6 +25,7 @@ app.layout = html.Div(
                         ),
                     ]
                 ),
+                html.Div(id="page-nav", className="page-nav"),
                 html.Button(
                     [SUN_ICON, MOON_ICON],
                     id="theme-toggle",
@@ -43,10 +36,26 @@ app.layout = html.Div(
             ],
             className="app-header",
         ),
-        _page_nav(),
         dash.page_container,
     ]
 )
+
+
+@app.callback(
+    Output("page-nav", "children"),
+    Input("_pages_location", "pathname"),
+)
+def update_page_nav(pathname):
+    return [
+        dcc.Link(
+            page["name"],
+            href=page["relative_path"],
+            className="page-nav-link active"
+            if pathname == page["relative_path"]
+            else "page-nav-link",
+        )
+        for page in dash.page_registry.values()
+    ]
 
 
 app.clientside_callback(

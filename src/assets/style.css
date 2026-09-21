@@ -57,28 +57,11 @@ hr {
   margin: 24px 0;
 }
 
-/* Page navigation */
-.page-nav {
-  display: flex;
-  gap: 16px;
-  padding: 0 32px 16px;
-}
-
-.page-nav-link {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-2);
-  text-decoration: none;
-}
-.page-nav-link:hover {
-  color: var(--co);
-}
-
 /* App shell */
 .app-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 32px;
   padding: 20px 32px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
@@ -96,6 +79,32 @@ hr {
   margin-top: 4px;
 }
 
+/* Page navigation */
+.page-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.page-nav-link {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+}
+.page-nav-link:hover {
+  color: var(--text);
+  background: var(--surface);
+}
+.page-nav-link.active {
+  color: var(--text);
+  font-weight: 600;
+  background: var(--surface);
+  border-color: var(--border);
+}
+
 .theme-toggle {
   width: 36px;
   height: 36px;
@@ -107,6 +116,8 @@ hr {
   justify-content: center;
   cursor: pointer;
   color: var(--text-2);
+  margin-left: auto;
+  flex-shrink: 0;
 }
 .theme-toggle:hover {
   border-color: var(--co);
