@@ -6,10 +6,15 @@ def filter_data(df: pd.DataFrame, years: list[int], columns: list[str]) -> pd.Da
     return df.loc[mask, ["datetime"] + columns]
 
 
-def format_summary(filtered_df: pd.DataFrame, years: list[int], columns: list[str]) -> str:
-    years_str = ", ".join(str(y) for y in sorted(years))
-    return (
-        f"선택된 연도: {years_str} / "
-        f"컬럼: {len(columns)}개 / "
-        f"필터링된 행 수: {len(filtered_df):,}행"
-    )
+def format_year_ranges(years: list[int]) -> str:
+    sorted_years = sorted(years)
+    ranges: list[tuple[int, int]] = []
+    start = prev = sorted_years[0]
+    for y in sorted_years[1:]:
+        if y == prev + 1:
+            prev = y
+            continue
+        ranges.append((start, prev))
+        start = prev = y
+    ranges.append((start, prev))
+    return ", ".join(f"{a}" if a == b else f"{a}–{b}" for a, b in ranges)

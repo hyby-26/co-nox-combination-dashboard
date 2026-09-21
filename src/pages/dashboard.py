@@ -1,0 +1,166 @@
+import dash
+from dash import Input, Output, State, callback, dcc, html
+from dash.exceptions import PreventUpdate
+
+from components import correlation, data_quality, distribution, overview, timeseries
+from components.summary_tiles import build_summary_tiles
+from data_loader import get_sensor_columns, get_years, load_data
+from filters import filter_data
+
+dash.register_page(__name__, path="/", name="대시보드")
+
+df = load_data()
+years = get_years(df)
+sensor_columns = get_sensor_columns(df)
+
+TAB_STYLE = {
+    "padding": "14px 4px",
+    "border": "none",
+    "borderBottom": "2px solid transparent",
+    "backgroundColor": "var(--bg)",
+    "color": "var(--text-2)",
+    "fontWeight": "500",
+    "fontSize": "14px",
+}
+TAB_SELECTED_STYLE = {
+    **TAB_STYLE,
+    "borderBottom": "2px solid var(--co)",
+    "color": "var(--text)",
+    "fontWeight": "600",
+}
+
+layout = html.Div(
+    [
+        dcc.Store(id="applied-filters", data={"years": years, "columns": sensor_columns}),
+        html.Div(
+            [
+                html.H3("필터"),
+                html.Label("연도 선택"),
+                dcc.Dropdown(
+                    id="year-filter",
+                    options=[{"label": str(y), "value": y} for y in years],
+                    value=years,
+                    multi=True,
+                    clearable=False,
+                ),
+                html.Label("컬럼 선택"),
+                dcc.Dropdown(
+                    id="column-filter",
+                    options=[{"label": c, "value": c} for c in sensor_columns],
+                    value=sensor_columns,
+                    multi=True,
+                    clearable=False,
+                ),
+                html.Button("적용", id="apply-filters", n_clicks=0, className="filter-apply-btn"),
+                html.Span(id="pending-indicator", className="pending-indicator"),
+            ],
+            className="sidebar",
+        ),
+        html.Div(
+            [
+                html.Div(id="summary-tiles"),
+                dcc.Tabs(
+                    id="tabs",
+                    value="tab-overview",
+                    className="app-tabs",
+                    children=[
+                        dcc.Tab(
+                            label="개요",
+                            value="tab-overview",
+                            style=TAB_STYLE,
+                            selected_style=TAB_SELECTED_STYLE,
+                        ),
+                        dcc.Tab(
+                            label="분포",
+                            value="tab-distribution",
+                            style=TAB_STYLE,
+                            selected_style=TAB_SELECTED_STYLE,
+                        ),
+                        dcc.Tab(
+                            label="시계열",
+                            value="tab-timeseries",
+                            style=TAB_STYLE,
+                            selected_style=TAB_SELECTED_STYLE,
+                        ),
+                        dcc.Tab(
+                            label="상관관계",
+                            value="tab-correlation",
+                            style=TAB_STYLE,
+                            selected_style=TAB_SELECTED_STYLE,
+                        ),
+                        dcc.Tab(
+                            label="데이터 품질",
+                            value="tab-quality",
+                            style=TAB_STYLE,
+                            selected_style=TAB_SELECTED_STYLE,
+                        ),
+                    ],
+                ),
+                html.Div(id="tab-content", children="준비 중", className="content-card"),
+            ],
+            className="main-panel",
+        ),
+    ],
+    className="app-shell",
+)
+
+
+@callback(
+    Output("applied-filters", "data"),
+    Input("apply-filters", "n_clicks"),
+    State("year-filter", "value"),
+    State("column-filter", "value"),
+    prevent_initial_call=True,
+)
+def apply_filters(n_clicks, pending_years, pending_columns):
+    if not pending_years or not pending_columns:
+        raise PreventUpdate
+    return {"years": pending_years, "columns": pending_columns}
+
+
+@callback(
+    Output("tab-content", "children"),
+    Input("tabs", "value"),
+    Input("applied-filters", "data"),
+)
+def update_tab_content(active_tab, applied_filters):
+    filtered = filter_data(df, applied_filters["years"], applied_filters["columns"])
+
+    if active_tab == "tab-overview":
+        return overview.render(filtered)
+    if active_tab == "tab-distribution":
+        return distribution.render(filtered)
+    if active_tab == "tab-timeseries":
+        return timeseries.render(filtered)
+    if active_tab == "tab-correlation":
+        return correlation.render(filtered)
+    if active_tab == "tab-quality":
+        return data_quality.render(filtered)
+    return "준비 중"
+
+
+@callback(
+    Output("summary-tiles", "children"),
+    Input("applied-filters", "data"),
+)
+def update_summary_tiles(applied_filters):
+    filtered = filter_data(df, applied_filters["years"], applied_filters["columns"])
+    return build_summary_tiles(
+        filtered, applied_filters["years"], applied_filters["columns"], sensor_columns
+    )
+
+
+@callback(
+    Output("pending-indicator", "children"),
+    Input("year-filter", "value"),
+    Input("column-filter", "value"),
+    Input("applied-filters", "data"),
+)
+def update_pending_indicator(pending_years, pending_columns, applied_filters):
+    pending_years = pending_years or []
+    pending_columns = pending_columns or []
+    is_pending = (
+        sorted(pending_years) != sorted(applied_filters["years"])
+        or sorted(pending_columns) != sorted(applied_filters["columns"])
+    )
+    return "변경사항 있음 · 적용을 눌러주세요" if is_pending else ""

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from filters import filter_data, format_summary
+from filters import filter_data, format_year_ranges
 
 
 def _sample_df():
@@ -22,12 +22,17 @@ def test_filter_data_keeps_only_selected_columns_plus_datetime():
     assert list(result.columns) == ["datetime", "CO"]
 
 
-def test_format_summary_includes_years_column_count_and_row_count():
-    filtered = pd.DataFrame({
-        "datetime": pd.to_datetime(["2011-01-01", "2011-01-02"]),
-        "CO": [1, 2],
-    })
-    summary = format_summary(filtered, years=[2011], columns=["CO"])
-    assert "2011" in summary
-    assert "1개" in summary
-    assert "2행" in summary
+def test_format_year_ranges_collapses_consecutive_years():
+    assert format_year_ranges([2011, 2012, 2013]) == "2011–2013"
+
+
+def test_format_year_ranges_splits_non_consecutive_gaps():
+    assert format_year_ranges([2011, 2012, 2014, 2015]) == "2011–2012, 2014–2015"
+
+
+def test_format_year_ranges_handles_single_year():
+    assert format_year_ranges([2013]) == "2013"
+
+
+def test_format_year_ranges_sorts_unordered_input():
+    assert format_year_ranges([2015, 2011, 2012]) == "2011–2012, 2015"
