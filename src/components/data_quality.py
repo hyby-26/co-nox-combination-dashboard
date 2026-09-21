@@ -28,6 +28,6 @@ def render(filtered_df: pd.DataFrame) -> html.Div:
     return html.Div(
         [
             dcc.Graph(figure=build_row_count_figure(filtered_df)),
-            build_missing_value_table(filtered_df),
+            html.Div(build_missing_value_table(filtered_df), className="table-scroll"),
         ]
     )

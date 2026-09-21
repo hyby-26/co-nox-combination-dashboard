@@ -166,9 +166,14 @@ hr {
 }
 
 /* Tables */
+.table-scroll {
+  overflow-x: auto;
+}
+
 table {
   border-collapse: collapse;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 13px;
 }
