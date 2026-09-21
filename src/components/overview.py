@@ -37,6 +37,6 @@ def render(filtered_df: pd.DataFrame) -> html.Div:
     return html.Div(
         [
             build_metadata_summary(filtered_df),
-            build_summary_stats_table(filtered_df),
+            html.Div(build_summary_stats_table(filtered_df), className="table-scroll"),
         ]
     )
