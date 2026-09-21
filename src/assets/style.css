@@ -251,6 +251,10 @@ hr {
 }
 
 .dash-options-list-option {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px;
   color: var(--text);
   background: transparent;
 }
@@ -260,6 +264,10 @@ hr {
 .dash-options-list-option.selected {
   background: var(--border);
   background: color-mix(in srgb, var(--co) 14%, var(--surface));
+}
+
+.dash-options-list-option-text {
+  font-size: 16px;
 }
 
 .dash-options-list-option-checkbox {
