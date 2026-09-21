@@ -48,7 +48,7 @@ layout = html.Div(
                 html.Label("컬럼 선택"),
                 dcc.Dropdown(
                     id="column-filter",
-                    options=[{"label": c, "value": c} for c in sensor_columns],
+                    options=[{"label": c, "value": c} for c in sorted(sensor_columns)],
                     value=sensor_columns,
                     multi=True,
                     clearable=False,
