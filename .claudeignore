@@ -1,0 +1,14 @@
+# 환경 변수 / 시크릿
+.env
+.env.*
+*.env
+secrets/
+credentials.json
+*.pem
+*.key
+
+# 가상환경 / 캐시
+.venv/
+venv/
+__pycache__/
+*.pyc
