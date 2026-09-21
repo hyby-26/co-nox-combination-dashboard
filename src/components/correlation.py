@@ -6,7 +6,7 @@ from dash import dcc
 def build_correlation_figure(filtered_df: pd.DataFrame) -> go.Figure:
     columns = [c for c in filtered_df.columns if c != "datetime"]
     corr = filtered_df[columns].corr()
-    return go.Figure(
+    fig = go.Figure(
         data=go.Heatmap(
             z=corr.values,
             x=corr.columns.tolist(),
@@ -16,6 +16,12 @@ def build_correlation_figure(filtered_df: pd.DataFrame) -> go.Figure:
             zmax=1,
         )
     )
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font_color="#8a8f89",
+    )
+    return fig
 
 
 def render(filtered_df: pd.DataFrame):

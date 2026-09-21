@@ -20,7 +20,15 @@ def build_timeseries_figure(filtered_df: pd.DataFrame, resample_rule: str = "D")
             row=i,
             col=1,
         )
-    fig.update_layout(height=300 * len(columns), showlegend=False)
+    fig.update_layout(
+        height=300 * len(columns),
+        showlegend=False,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font_color="#8a8f89",
+    )
+    fig.update_xaxes(gridcolor="rgba(128,128,128,0.15)", zerolinecolor="rgba(128,128,128,0.15)")
+    fig.update_yaxes(gridcolor="rgba(128,128,128,0.15)", zerolinecolor="rgba(128,128,128,0.15)")
     return fig
 
 

@@ -5,7 +5,15 @@ from dash import dcc, html
 
 def build_row_count_figure(filtered_df: pd.DataFrame) -> go.Figure:
     counts = filtered_df["datetime"].dt.year.value_counts().sort_index()
-    return go.Figure(data=go.Bar(x=counts.index.astype(str), y=counts.values))
+    fig = go.Figure(data=go.Bar(x=counts.index.astype(str), y=counts.values))
+    fig.update_layout(
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font_color="#8a8f89",
+    )
+    fig.update_xaxes(gridcolor="rgba(128,128,128,0.15)", zerolinecolor="rgba(128,128,128,0.15)")
+    fig.update_yaxes(gridcolor="rgba(128,128,128,0.15)", zerolinecolor="rgba(128,128,128,0.15)")
+    return fig
 
 
 def build_missing_value_table(filtered_df: pd.DataFrame) -> html.Table:
