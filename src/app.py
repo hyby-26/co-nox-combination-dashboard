@@ -1,6 +1,6 @@
 from dash import Dash, Input, Output, dcc, html
 
-from components import correlation, data_quality, distribution, timeseries
+from components import correlation, data_quality, distribution, overview, timeseries
 from data_loader import get_sensor_columns, get_years, load_data
 from filters import filter_data, format_summary
 
@@ -77,6 +77,8 @@ def update_tab_content(active_tab, selected_years, selected_columns):
 
     filtered = filter_data(df, selected_years, selected_columns)
 
+    if active_tab == "tab-overview":
+        return overview.render(filtered)
     if active_tab == "tab-distribution":
         return distribution.render(filtered)
     if active_tab == "tab-timeseries":
