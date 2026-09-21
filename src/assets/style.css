@@ -176,6 +176,96 @@ hr {
   color: var(--nox);
 }
 
+/* Dash's built-in multi-select dropdown menu: checkbox + label inline, readable text */
+.dash-dropdown-content {
+  font-size: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  color: var(--text);
+}
+
+.dash-options-list-option-wrapper {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-dropdown {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+}
+
+.dash-dropdown-value,
+.dash-dropdown-value-item {
+  color: var(--text);
+}
+
+.dash-dropdown-value-count {
+  color: var(--text-2);
+}
+
+.dash-dropdown-trigger-icon {
+  color: var(--text-2);
+}
+
+.dash-dropdown-search-container {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  border-color: var(--co) !important;
+  outline-color: var(--co) !important;
+}
+
+.dash-dropdown-search {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+}
+.dash-dropdown-search::placeholder {
+  color: var(--text-2);
+}
+.dash-dropdown-search:focus,
+.dash-dropdown-search:focus-visible {
+  border-color: var(--co);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--border);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--co) 30%, transparent);
+}
+
+.dash-dropdown-actions {
+  border-bottom: 1px solid var(--border);
+}
+.dash-dropdown-action-button {
+  color: var(--co);
+}
+.dash-dropdown-action-button:hover {
+  color: var(--nox);
+}
+
+.dash-options-list {
+  background: var(--surface);
+}
+
+.dash-options-list-option {
+  color: var(--text);
+  background: transparent;
+}
+.dash-options-list-option:hover {
+  background: var(--bg);
+}
+.dash-options-list-option.selected {
+  background: var(--border);
+  background: color-mix(in srgb, var(--co) 14%, var(--surface));
+}
+
+.dash-options-list-option-checkbox {
+  accent-color: var(--co);
+}
+
 .main-panel {
   flex-grow: 1;
   min-width: 0;
