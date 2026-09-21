@@ -186,12 +186,6 @@ hr {
   color: var(--text);
 }
 
-.dash-options-list-option-wrapper {
-  display: flex !important;
-  align-items: center;
-  gap: 8px;
-}
-
 .dash-dropdown {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -264,10 +258,6 @@ hr {
 .dash-options-list-option.selected {
   background: var(--border);
   background: color-mix(in srgb, var(--co) 14%, var(--surface));
-}
-
-.dash-options-list-option-text {
-  font-size: 16px;
 }
 
 .dash-options-list-option-checkbox {
