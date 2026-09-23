@@ -19,3 +19,16 @@ python src/app.py
 source .venv/bin/activate
 pytest
 ```
+
+## 배포 (Docker / Cloud Run)
+
+```bash
+docker build -t co-nox-combination-dashboard .
+docker run -p 8080:8080 co-nox-combination-dashboard
+```
+
+브라우저에서 `http://localhost:8080` 접속. 컨테이너는 `$PORT` 환경변수(기본 8080)로 바인딩하므로 Cloud Run에 그대로 배포 가능:
+
+```bash
+gcloud run deploy co-nox-combination-dashboard --source . --region <region>
+```
