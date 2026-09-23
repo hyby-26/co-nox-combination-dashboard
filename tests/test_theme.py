@@ -54,3 +54,18 @@ def test_enable_hover_highlight_marks_figure_for_client_script():
     fig = enable_hover_highlight(go.Figure())
     assert fig.layout.meta == {"hoverHighlight": HIGHLIGHT_COLOR}
     assert fig.layout.hovermode == "x"
+
+
+def test_apply_chart_style_keeps_side_margins_tight():
+    # Plotly's default 80px side margins leave the right side visibly wider than the left
+    # (whose margin holds the y tick labels); tick labels still get room via automargin.
+    fig = apply_chart_style(go.Figure())
+    assert fig.layout.margin.l == fig.layout.margin.r
+    assert fig.layout.margin.r <= 16
+
+
+def test_apply_chart_style_trims_top_margin_but_leaves_room_for_titles():
+    # Default 100px leaves an empty band above every chart; subplot titles and the
+    # modebar still need a little room up there.
+    fig = apply_chart_style(go.Figure())
+    assert 24 <= fig.layout.margin.t <= 48
