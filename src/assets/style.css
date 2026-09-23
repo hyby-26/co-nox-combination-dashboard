@@ -198,6 +198,10 @@ hr {
 .filter-apply-btn:hover {
   opacity: 0.9;
 }
+.filter-apply-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 .pending-indicator {
   display: block;
