@@ -19,6 +19,21 @@ def _padded_range(values: pd.Series) -> list[float] | None:
     return [low - pad, high + pad]
 
 
+def _share_one_x_axis(fig: go.Figure, rows: int) -> None:
+    """Move every row onto the single `x` axis. make_subplots gives each row its own x axis
+    (x, x2, ...) matched together, but hoversubplots="axis" only gathers subplots that share
+    the same axis object — so the unified hover label would otherwise list just one row.
+    Call it last: update_xaxes() walks make_subplots' grid and would recreate x2, x3, ..."""
+    fig.update_traces(xaxis="x")
+    for i in range(2, rows + 1):
+        fig.layout[f"xaxis{i}"] = None
+        fig.layout[f"yaxis{i}"].anchor = "x"
+    # Date ticks belong under the bottom row, where make_subplots had put them.
+    fig.layout.xaxis.update(
+        matches=None, anchor="y" if rows == 1 else f"y{rows}", showticklabels=True
+    )
+
+
 def build_timeseries_figure(filtered_df: pd.DataFrame, resample_rule: str = "D") -> go.Figure:
     columns = [c for c in filtered_df.columns if c != "datetime"]
     resampled = (
@@ -42,7 +57,7 @@ def build_timeseries_figure(filtered_df: pd.DataFrame, resample_rule: str = "D")
                 mode="lines",
                 name=display_name(col),
                 line_color=SERIES_COLOR,
-                hovertemplate=f"{display_name(col)} %{{y:.2f}}<extra></extra>",
+                hovertemplate=f"<b>{display_name(col)}</b> %{{y:.2f}}<extra></extra>",
             ),
             row=i,
             col=1,
@@ -51,9 +66,18 @@ def build_timeseries_figure(filtered_df: pd.DataFrame, resample_rule: str = "D")
         if y_range is not None:
             fig.update_yaxes(range=y_range, row=i, col=1)
     fig.update_layout(height=300 * len(columns), showlegend=False)
-    fig.update_xaxes(hoverformat="%Y-%m-%d")
+    # chart_hover.js draws the crosshair, so Plotly's unified-hover spike line is off.
+    fig.update_xaxes(
+        hoverformat="%Y-%m-%d",
+        showspikes=False,
+        unifiedhovertitle_text="<b>%{x|%Y-%m-%d}</b>",
+    )
     apply_chart_style(fig)
-    return enable_hover_highlight(fig)
+    enable_hover_highlight(fig)
+    # One label listing every column at the hovered date, since the rows don't fit on one screen.
+    fig.update_layout(hovermode="x unified", hoversubplots="axis")
+    _share_one_x_axis(fig, len(columns))
+    return fig
 
 
 def render(filtered_df: pd.DataFrame):

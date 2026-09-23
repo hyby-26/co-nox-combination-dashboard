@@ -1,12 +1,14 @@
 /* Hover highlight for figures built with theme.enable_hover_highlight() (layout.meta.hoverHighlight).
    - Bar traces: the hovered bar turns the highlight color.
-   - Line traces: a crosshair spans every subplot, and each other subplot gets a dot + value
-     at the same x, so one date can be read across all sensors at once.
-   Highlight marks are layout shapes/annotations tagged with TAG, so they're cheap to draw
+   - Line traces: a crosshair spans every subplot, and each subplot gets a dot at the same x.
+     The values themselves come from Plotly's unified hover label (hovermode 'x unified'),
+     so one date can be read across all sensors at once; compactUnifiedLabel() strips its
+     color swatches.
+   Highlight marks are layout shapes tagged with TAG, so they're cheap to draw
    (relayout, no data recalculation) and easy to strip back out. They're placed in axis-domain
    coordinates ('x domain'/'y domain'), not data coordinates: data-referenced marks join
-   autorange, so a value label near the right edge would stretch the x-axis, shift the hovered
-   point, and make Plotly's rehover fire plotly_unhover — wiping the crosshair just drawn. */
+   autorange, so a mark near the right edge would stretch the x-axis, shift the hovered point,
+   and make Plotly's rehover fire plotly_unhover — wiping the crosshair just drawn. */
 (function () {
   var TAG = 'hover-highlight';
 
@@ -21,11 +23,6 @@
 
   function withoutTagged(items) {
     return (items || []).filter(function (item) { return item.name !== TAG; });
-  }
-
-  // Matches the hovertemplate precision (%{y:.2f}) set in components/timeseries.py.
-  function formatValue(v) {
-    return v.toFixed(2);
   }
 
   // 'x2' -> 'x2 domain' ref and its fullLayout axis ('xaxis2').
@@ -69,7 +66,6 @@
 
   function highlightX(gd, pt, color) {
     var surface = cssVar('--surface');
-    var text = cssVar('--text');
     var xref = pt.fullData.xaxis;
     var x = toDomain(axisOf(gd, xref), pt.x);
     var shapes = [{
@@ -77,7 +73,6 @@
       xref: domainRef(xref), yref: 'paper', x0: x, x1: x, y0: 0, y1: 1,
       line: { color: color, width: 1 },
     }];
-    var annotations = [];
     gd._fullData.forEach(function (trace) {
       if (trace.type !== 'scatter' && trace.type !== 'scattergl') return;
       var y = trace.y[pt.pointNumber];
@@ -85,40 +80,77 @@
       // Domain refs aren't hidden when off-axis like data refs are, so skip those ourselves.
       var ty = toDomain(axisOf(gd, trace.yaxis), y);
       if (!inDomain(ty)) return;
-      var tx = domainRef(trace.xaxis);
-      var yref = domainRef(trace.yaxis);
       shapes.push({
         name: TAG, type: 'circle', layer: 'above',
-        xref: tx, yref: yref, xsizemode: 'pixel', ysizemode: 'pixel',
+        xref: domainRef(trace.xaxis), yref: domainRef(trace.yaxis),
+        xsizemode: 'pixel', ysizemode: 'pixel',
         xanchor: x, yanchor: ty, x0: -5, x1: 5, y0: -5, y1: 5,
         fillcolor: color, line: { color: surface, width: 2 },
       });
-      // The hovered subplot already shows its value in the hover label.
-      if (trace.index === pt.curveNumber) return;
-      annotations.push({
-        name: TAG, xref: tx, yref: yref, x: x, y: ty,
-        text: formatValue(y), showarrow: false, xanchor: 'left', yanchor: 'bottom',
-        xshift: 6, yshift: 2, font: { color: text, size: 11 },
-      });
     });
-    Plotly.relayout(gd, {
-      shapes: withoutTagged(gd.layout.shapes).concat(shapes),
-      annotations: withoutTagged(gd.layout.annotations).concat(annotations),
-    });
+    Plotly.relayout(gd, { shapes: withoutTagged(gd.layout.shapes).concat(shapes) });
   }
 
   function clearX(gd) {
     var shapes = gd.layout.shapes || [];
     if (!shapes.some(function (s) { return s.name === TAG; })) return;
-    Plotly.relayout(gd, {
-      shapes: withoutTagged(shapes),
-      annotations: withoutTagged(gd.layout.annotations),
-    });
+    Plotly.relayout(gd, { shapes: withoutTagged(shapes) });
+  }
+
+  var LABEL_PADDING = 8; // px around the unified label's text, on every side
+
+  // The unified hover label is drawn as a legend: each row gets a line swatch, and its text
+  // sits past a fixed swatch slot. Every series shares one color, so the swatches say
+  // nothing — hide them and pull the text flush with the title. Plotly's box hugs the text
+  // (~3px), so refit it with even padding, keeping the edge nearest the crosshair in place.
+  function compactUnifiedLabel(gd) {
+    var legend = gd.querySelector('.hoverlayer .legend');
+    var title = legend && legend.querySelector('.legendtitletext');
+    var texts = legend ? legend.querySelectorAll('.legendtext') : [];
+    if (!title || !texts.length) return;
+    // Row groups are translated 1px right of the title, so line their text up with it.
+    var textX = Number(title.getAttribute('x')) - 1;
+    if (!(Number(texts[0].getAttribute('x')) > textX)) return; // already compacted
+    legend.querySelectorAll('.traces .layers').forEach(function (el) { el.style.display = 'none'; });
+    texts.forEach(function (t) { t.setAttribute('x', textX); });
+
+    var bg = legend.querySelector('rect.bg');
+    var oldX = Number(bg.getAttribute('x'));
+    var oldY = Number(bg.getAttribute('y'));
+    var oldW = Number(bg.getAttribute('width'));
+    var oldH = Number(bg.getAttribute('height'));
+    var content = legend.querySelector('.scrollbox').getBBox();
+    var x = content.x - LABEL_PADDING;
+    var y = content.y - LABEL_PADDING;
+    var w = content.width + 2 * LABEL_PADDING;
+    var h = content.height + 2 * LABEL_PADDING;
+    bg.setAttribute('x', x);
+    bg.setAttribute('y', y);
+    bg.setAttribute('width', w);
+    bg.setAttribute('height', h);
+
+    // Plotly puts the box right of the point, or left of it when there's no room. Keep that
+    // near edge where Plotly had it, and keep the box vertically centered where it was.
+    var pos = /translate\(([-\d.]+),\s*([-\d.]+)\)/.exec(legend.getAttribute('transform'));
+    if (!pos) return;
+    var left = Number(pos[1]);
+    var top = Number(pos[2]);
+    var pt = gd._hoverdata && gd._hoverdata[0];
+    var onLeft = pt && left < pt.xaxis._offset + pt.xaxis.d2p(pt.x);
+    var dx = onLeft ? (oldX + oldW) - (x + w) : oldX - x;
+    var dy = (oldY + oldH / 2) - (y + h / 2);
+    legend.setAttribute('transform', 'translate(' + (left + dx) + ',' + (top + dy) + ')');
   }
 
   function bind(gd) {
     if (gd.__hoverHighlightBound || typeof gd.on !== 'function') return;
     gd.__hoverHighlightBound = true;
+
+    // Plotly redraws the label on every hover, including rehovers that emit no event, so
+    // watch the DOM instead. Observer callbacks run before paint: no flash of the swatches.
+    new MutationObserver(function () {
+      if (highlightColor(gd)) compactUnifiedLabel(gd);
+    }).observe(gd, { childList: true, subtree: true });
     var pending = null;
     var frame = null;
 
