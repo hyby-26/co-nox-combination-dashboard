@@ -84,3 +84,24 @@ def test_build_timeseries_figure_formats_hover_without_trace_name_box():
     fig = build_timeseries_figure(df, resample_rule="D")
     assert fig.data[0].hovertemplate == "NOx %{y:.2f}<extra></extra>"
     assert fig.layout.xaxis.hoverformat == "%Y-%m-%d"
+
+
+def test_build_timeseries_figure_pads_y_range_so_lines_do_not_touch_edges():
+    df = pd.DataFrame({
+        "datetime": pd.date_range("2011-01-01", periods=48, freq="h"),
+        "TAT": [530] * 24 + [550] * 24,
+        "CO": [0] * 24 + [10] * 24,
+    })
+    fig = build_timeseries_figure(df, resample_rule="D")
+    assert list(fig.layout.yaxis.range) == [528.0, 552.0]
+    assert list(fig.layout.yaxis2.range) == [-1.0, 11.0]
+
+
+def test_build_timeseries_figure_pads_flat_series():
+    df = pd.DataFrame({
+        "datetime": pd.date_range("2011-01-01", periods=48, freq="h"),
+        "AT": [20] * 48,
+    })
+    fig = build_timeseries_figure(df, resample_rule="D")
+    low, high = fig.layout.yaxis.range
+    assert low < 20 < high
