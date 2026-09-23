@@ -2,6 +2,7 @@ import dash
 from dash import Dash, Input, Output, State, dcc, html
 
 app = Dash(__name__, use_pages=True)
+server = app.server
 
 SUN_ICON = html.Img(
     src=app.get_asset_url("icons/sun.svg"), className="icon-sun", alt=""
