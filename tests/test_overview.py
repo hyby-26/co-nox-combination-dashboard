@@ -26,3 +26,12 @@ def test_build_summary_stats_table_includes_mean_row_for_each_column():
     mean_row = next(row for row in table.children[1:] if row.children[0].children == "mean")
     assert mean_row.children[1].children == "2.000"
     assert mean_row.children[2].children == "20.000"
+
+
+def test_build_summary_stats_table_uses_display_names_in_header():
+    df = pd.DataFrame({
+        "datetime": pd.to_datetime(["2011-01-01", "2011-01-02"]),
+        "NOX": [1.0, 2.0],
+    })
+    header_cells = build_summary_stats_table(df).children[0].children
+    assert [cell.children for cell in header_cells] == ["통계", "NOx"]
