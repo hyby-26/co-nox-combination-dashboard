@@ -20,6 +20,25 @@
   --nox: #F2994A;
 }
 
+/* Dash 4.x component theme: its runtime-injected :root vars default to a purple
+   accent (#7f4bc4) and navy-tinted text/strokes. html:root outranks that :root
+   regardless of load order; values reference app tokens, so dark mode follows
+   automatically when --co/--text/etc. switch on the same <html> element. */
+html:root {
+  --Dash-Fill-Interactive-Strong: var(--co);
+  --Dash-Fill-Interactive-Weak: color-mix(in srgb, var(--co) 6%, transparent);
+  --Dash-Fill-Inverse-Strong: var(--surface);
+  --Dash-Fill-Primary-Hover: color-mix(in srgb, var(--text) 4%, transparent);
+  --Dash-Fill-Primary-Active: color-mix(in srgb, var(--text) 8%, transparent);
+  --Dash-Fill-Disabled: var(--border);
+  --Dash-Text-Strong: var(--text);
+  --Dash-Text-Primary: var(--text);
+  --Dash-Text-Weak: var(--text-2);
+  --Dash-Text-Disabled: color-mix(in srgb, var(--text-2) 60%, transparent);
+  --Dash-Stroke-Strong: var(--text-2);
+  --Dash-Stroke-Weak: var(--border);
+}
+
 html {
   background: var(--bg);
 }
@@ -209,10 +228,6 @@ hr {
   color: var(--text);
 }
 
-.dash-dropdown-value-count {
-  color: var(--text-2);
-}
-
 .dash-dropdown-trigger-icon {
   color: var(--text-2);
 }
@@ -220,25 +235,21 @@ hr {
 .dash-dropdown-search-container {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  border-color: var(--co) !important;
-  outline-color: var(--co) !important;
 }
 
 .dash-dropdown-search {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  background: transparent;
+  border: none;
   color: var(--text);
 }
 .dash-dropdown-search::placeholder {
   color: var(--text-2);
 }
+/* The search container draws the only frame + focus highlight; the input itself stays flat. */
 .dash-dropdown-search:focus,
 .dash-dropdown-search:focus-visible {
-  border-color: var(--co);
   outline: none;
-  box-shadow: 0 0 0 2px var(--border);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--co) 30%, transparent);
+  box-shadow: none;
 }
 
 .dash-dropdown-actions {
@@ -269,10 +280,6 @@ hr {
 .dash-options-list-option.selected {
   background: var(--border);
   background: color-mix(in srgb, var(--co) 14%, var(--surface));
-}
-
-.dash-options-list-option-checkbox {
-  accent-color: var(--co);
 }
 
 .main-panel {
@@ -350,4 +357,15 @@ th:first-child, td:first-child {
 th {
   color: var(--text-2);
   font-weight: 500;
+}
+
+/* Plotly hover labels: figures are built server-side without knowing the theme, so the
+   label surface/text follow the CSS tokens here (border color comes from theme.py). */
+.js-plotly-plot .hoverlayer .hovertext path,
+.js-plotly-plot .hoverlayer .axistext path {
+  fill: var(--surface) !important;
+}
+.js-plotly-plot .hoverlayer .hovertext text,
+.js-plotly-plot .hoverlayer .axistext text {
+  fill: var(--text) !important;
 }

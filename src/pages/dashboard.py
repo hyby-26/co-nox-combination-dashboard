@@ -5,6 +5,7 @@ from dash.exceptions import PreventUpdate
 from components import correlation, data_quality, distribution, overview, timeseries
 from components.summary_tiles import build_summary_tiles
 from data_loader import get_sensor_columns, get_years, load_data
+from labels import display_name
 from filters import filter_data
 
 dash.register_page(__name__, path="/", name="대시보드")
@@ -48,7 +49,7 @@ layout = html.Div(
                 html.Label("컬럼 선택"),
                 dcc.Dropdown(
                     id="column-filter",
-                    options=[{"label": c, "value": c} for c in sorted(sensor_columns)],
+                    options=[{"label": display_name(c), "value": c} for c in sorted(sensor_columns)],
                     value=sensor_columns,
                     multi=True,
                     clearable=False,
