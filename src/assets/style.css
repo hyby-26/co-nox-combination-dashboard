@@ -351,3 +351,14 @@ th {
   color: var(--text-2);
   font-weight: 500;
 }
+
+/* Plotly hover labels: figures are built server-side without knowing the theme, so the
+   label surface/text follow the CSS tokens here (border color comes from theme.py). */
+.js-plotly-plot .hoverlayer .hovertext path,
+.js-plotly-plot .hoverlayer .axistext path {
+  fill: var(--surface) !important;
+}
+.js-plotly-plot .hoverlayer .hovertext text,
+.js-plotly-plot .hoverlayer .axistext text {
+  fill: var(--text) !important;
+}
