@@ -20,6 +20,25 @@
   --nox: #F2994A;
 }
 
+/* Dash 4.x component theme: its runtime-injected :root vars default to a purple
+   accent (#7f4bc4) and navy-tinted text/strokes. html:root outranks that :root
+   regardless of load order; values reference app tokens, so dark mode follows
+   automatically when --co/--text/etc. switch on the same <html> element. */
+html:root {
+  --Dash-Fill-Interactive-Strong: var(--co);
+  --Dash-Fill-Interactive-Weak: color-mix(in srgb, var(--co) 6%, transparent);
+  --Dash-Fill-Inverse-Strong: var(--surface);
+  --Dash-Fill-Primary-Hover: color-mix(in srgb, var(--text) 4%, transparent);
+  --Dash-Fill-Primary-Active: color-mix(in srgb, var(--text) 8%, transparent);
+  --Dash-Fill-Disabled: var(--border);
+  --Dash-Text-Strong: var(--text);
+  --Dash-Text-Primary: var(--text);
+  --Dash-Text-Weak: var(--text-2);
+  --Dash-Text-Disabled: color-mix(in srgb, var(--text-2) 60%, transparent);
+  --Dash-Stroke-Strong: var(--text-2);
+  --Dash-Stroke-Weak: var(--border);
+}
+
 html {
   background: var(--bg);
 }
