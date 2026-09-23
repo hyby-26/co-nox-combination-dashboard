@@ -41,6 +41,9 @@ html:root {
 
 html {
   background: var(--bg);
+  /* Always reserve the scrollbar's width: otherwise opening a tall tab (e.g. 시계열) adds a
+     scrollbar, narrows the page, and already-drawn Plotly charts visibly shrink to refit. */
+  scrollbar-gutter: stable;
 }
 
 body {
