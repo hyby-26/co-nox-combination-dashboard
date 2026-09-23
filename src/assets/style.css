@@ -228,10 +228,6 @@ hr {
   color: var(--text);
 }
 
-.dash-dropdown-value-count {
-  color: var(--text-2);
-}
-
 .dash-dropdown-trigger-icon {
   color: var(--text-2);
 }
@@ -239,25 +235,21 @@ hr {
 .dash-dropdown-search-container {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  border-color: var(--co) !important;
-  outline-color: var(--co) !important;
 }
 
 .dash-dropdown-search {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  background: transparent;
+  border: none;
   color: var(--text);
 }
 .dash-dropdown-search::placeholder {
   color: var(--text-2);
 }
+/* The search container draws the only frame + focus highlight; the input itself stays flat. */
 .dash-dropdown-search:focus,
 .dash-dropdown-search:focus-visible {
-  border-color: var(--co);
   outline: none;
-  box-shadow: 0 0 0 2px var(--border);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--co) 30%, transparent);
+  box-shadow: none;
 }
 
 .dash-dropdown-actions {
@@ -288,10 +280,6 @@ hr {
 .dash-options-list-option.selected {
   background: var(--border);
   background: color-mix(in srgb, var(--co) 14%, var(--surface));
-}
-
-.dash-options-list-option-checkbox {
-  accent-color: var(--co);
 }
 
 .main-panel {
