@@ -4,24 +4,33 @@ import plotly.graph_objects as go
 from dash import dcc
 from plotly.subplots import make_subplots
 
+from labels import display_name
+from theme import SERIES_COLOR, apply_chart_style, enable_hover_highlight
+
 
 def build_histogram_figure(filtered_df: pd.DataFrame, bins: int = 50) -> go.Figure:
     columns = [c for c in filtered_df.columns if c != "datetime"]
-    fig = make_subplots(rows=len(columns), cols=1, subplot_titles=columns)
+    fig = make_subplots(
+        rows=len(columns), cols=1, subplot_titles=[display_name(c) for c in columns]
+    )
     for i, col in enumerate(columns, start=1):
         counts, edges = np.histogram(filtered_df[col], bins=bins)
         centers = (edges[:-1] + edges[1:]) / 2
-        fig.add_trace(go.Bar(x=centers, y=counts, name=col), row=i, col=1)
-    fig.update_layout(
-        height=300 * len(columns),
-        showlegend=False,
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
-        font_color="#8a8f89",
-    )
-    fig.update_xaxes(gridcolor="rgba(128,128,128,0.15)", zerolinecolor="rgba(128,128,128,0.15)")
-    fig.update_yaxes(gridcolor="rgba(128,128,128,0.15)", zerolinecolor="rgba(128,128,128,0.15)")
-    return fig
+        fig.add_trace(
+            go.Bar(
+                x=centers,
+                y=counts,
+                name=display_name(col),
+                marker_color=SERIES_COLOR,
+                hovertemplate="%{y:,}건<extra></extra>",
+            ),
+            row=i,
+            col=1,
+        )
+    fig.update_layout(height=300 * len(columns), showlegend=False)
+    fig.update_xaxes(hoverformat=".2f")
+    apply_chart_style(fig)
+    return enable_hover_highlight(fig)
 
 
 def render(filtered_df: pd.DataFrame):
