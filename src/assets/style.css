@@ -377,3 +377,12 @@ th {
 .js-plotly-plot .hoverlayer .axistext text {
   fill: var(--text) !important;
 }
+/* Unified hover label (hovermode 'x unified') is drawn as a legend box whose background
+   defaults to paper_bgcolor — transparent here — so give it the same surface. */
+.js-plotly-plot .hoverlayer .legend rect.bg {
+  fill: var(--surface) !important;
+  fill-opacity: 1 !important;
+}
+.js-plotly-plot .hoverlayer .legend text {
+  fill: var(--text) !important;
+}
