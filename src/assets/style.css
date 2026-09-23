@@ -198,6 +198,10 @@ hr {
 .filter-apply-btn:hover {
   opacity: 0.9;
 }
+.filter-apply-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 .pending-indicator {
   display: block;
@@ -273,6 +277,10 @@ hr {
   gap: 8px;
   color: var(--text);
   background: transparent;
+}
+/* Options render as <label>, so `.sidebar label`'s 16px/8px margin leaks in; even it out. */
+.sidebar .dash-options-list-option {
+  margin: 8px 0;
 }
 .dash-options-list-option:hover {
   background: var(--bg);

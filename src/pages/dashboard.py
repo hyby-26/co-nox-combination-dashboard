@@ -44,7 +44,7 @@ layout = html.Div(
                     options=[{"label": str(y), "value": y} for y in years],
                     value=years,
                     multi=True,
-                    clearable=False,
+                    clearable=True,
                 ),
                 html.Label("컬럼 선택"),
                 dcc.Dropdown(
@@ -52,7 +52,7 @@ layout = html.Div(
                     options=[{"label": display_name(c), "value": c} for c in sorted(sensor_columns)],
                     value=sensor_columns,
                     multi=True,
-                    clearable=False,
+                    clearable=True,
                 ),
                 html.Button("적용", id="apply-filters", n_clicks=0, className="filter-apply-btn"),
                 html.Span(id="pending-indicator", className="pending-indicator"),
@@ -155,6 +155,7 @@ def update_summary_tiles(applied_filters):
 
 @callback(
     Output("pending-indicator", "children"),
+    Output("apply-filters", "disabled"),
     Input("year-filter", "value"),
     Input("column-filter", "value"),
     Input("applied-filters", "data"),
@@ -162,8 +163,10 @@ def update_summary_tiles(applied_filters):
 def update_pending_indicator(pending_years, pending_columns, applied_filters):
     pending_years = pending_years or []
     pending_columns = pending_columns or []
+    if not pending_years or not pending_columns:
+        return "연도와 컬럼을 1개 이상 선택해주세요", True
     is_pending = (
         sorted(pending_years) != sorted(applied_filters["years"])
         or sorted(pending_columns) != sorted(applied_filters["columns"])
     )
-    return "변경사항 있음 · 적용을 눌러주세요" if is_pending else ""
+    return ("변경사항 있음 · 적용을 눌러주세요" if is_pending else ""), False
